@@ -1,3 +1,4 @@
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -38,5 +39,10 @@ public class BasicStep extends FluentAdapter {
   @Then(value = "le titre est toto")
   public void step3() {
     assertThat(title()).contains("FluentLenium");
+  }
+
+  @After
+  public void after(){
+      this.quit();
   }
 }
