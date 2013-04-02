@@ -34,23 +34,32 @@ import java.util.Map;
  * Time: 07:57
  */
 public class BrowserMapper {
-    private String name;
+	private String name;
 
-    private static Map<Browser, WebDriverLazyLoader> browserMapper = new HashMap<Browser, WebDriverLazyLoader>();
-    static {
-        browserMapper.put(Browser.CHROME, new WebDriverLazyLoader(ChromeDriver.class));
-        browserMapper.put(Browser.FIREFOX, new WebDriverLazyLoader(FirefoxDriver.class));
-        browserMapper.put(Browser.HTMLUNIT, new WebDriverLazyLoader(HtmlUnitDriver.class));
-    }
+	private static Map<Browser, WebDriverLazyLoader> browserMapper = new HashMap<Browser, WebDriverLazyLoader>();
+	private static Map<Browser, WebDriver> webDriverInstances = new HashMap<Browser, WebDriver>();
 
-    public static WebDriver getDriver(Browser browser) {
-        WebDriverLazyLoader webDriverLazyLoader = browserMapper.get(browser);
-        if (webDriverLazyLoader != null) {
-            return webDriverLazyLoader.getWebDriverClass();
-        } else {
-            return browserMapper.get(Browser.HTMLUNIT).getWebDriverClass();
-        }
-    }
+
+	static {
+		browserMapper.put(Browser.CHROME, new WebDriverLazyLoader(ChromeDriver.class));
+		browserMapper.put(Browser.FIREFOX, new WebDriverLazyLoader(FirefoxDriver.class));
+		browserMapper.put(Browser.HTMLUNIT, new WebDriverLazyLoader(HtmlUnitDriver.class));
+	}
+
+	public static WebDriver getCachedDriver(Browser browser) {
+		if (!webDriverInstances.containsKey(browser)) {
+			webDriverInstances.put(browser, getDriver(browser));
+		}
+		return webDriverInstances.get(browser);
+	}
+
+	public static WebDriver getDriver(Browser browser) {
+		WebDriverLazyLoader webDriverLazyLoader = browserMapper.get(browser);
+		if (webDriverLazyLoader != null) {
+			return webDriverLazyLoader.getWebDriverClass();
+		}
+		return browserMapper.get(Browser.HTMLUNIT).getWebDriverClass();
+	}
 
 
 }

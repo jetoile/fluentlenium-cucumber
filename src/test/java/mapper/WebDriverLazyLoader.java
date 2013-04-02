@@ -32,8 +32,8 @@ class WebDriverLazyLoader {
 
     public WebDriver getWebDriverClass() {
         try {
-            return (WebDriver)this.webDriverClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+			return (WebDriver)this.webDriverClass.newInstance();
+        } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
         return null;
