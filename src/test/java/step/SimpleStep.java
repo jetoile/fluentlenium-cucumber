@@ -9,17 +9,9 @@ import org.fluentlenium.core.FluentAdapter;
 import org.fluentlenium.core.annotation.Page;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import page.BingPage;
-import page.HomePage;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-/**
- * Created with IntelliJ IDEA.
- * User: khanh
- * Date: 02/04/13
- * Time: 11:28
- * To change this template use File | Settings | File Templates.
- */
 public class SimpleStep extends FluentAdapter {
 
 	@Page

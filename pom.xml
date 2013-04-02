@@ -18,13 +18,21 @@
         <dependency>
             <groupId>org.fluentlenium</groupId>
             <artifactId>fluentlenium-core</artifactId>
+            <!--<version>0.7.9-SNAPSHOT</version>-->
             <version>0.7.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.detro.ghostdriver</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
             <version>1.9.0-rc1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.easytesting</groupId>
@@ -37,30 +45,28 @@
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-junit</artifactId>
             <version>1.1.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>1.1.1</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-picocontainer</artifactId>
             <version>1.1.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
+            <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-        <!--<groupId>javax.serlvet</groupId>-->
-        <!--<artifactId>servlet-api</artifactId>-->
-        <!--<version>3.0</version>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -122,14 +128,10 @@
                 </plugins>
             </build>
         </profile>
-        <!--</profiles>-->
 
-        <!--<profiles>-->
         <profile>
             <id>tomcat-run</id>
-            <activation>
-                <!--<activeByDefault>false</activeByDefault>-->
-            </activation>
+            <activation/>
             <build>
                 <plugins>
                     <plugin>
@@ -144,7 +146,6 @@
                                 </goals>
                                 <phase>install</phase>
                                 <configuration>
-                                    <!--<fork>true</fork>-->
                                     <contextFile>src/test/context.xml</contextFile>
                                 </configuration>
                             </execution>
