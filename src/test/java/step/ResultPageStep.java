@@ -4,7 +4,6 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import org.fluentlenium.core.FluentAdapter;
 import org.fluentlenium.core.annotation.Page;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import page.ResultPage;
 
 public class ResultPageStep extends FluentAdapter {
@@ -14,8 +13,8 @@ public class ResultPageStep extends FluentAdapter {
 
     @Before
     public void before() {
-        this.initFluent(new FirefoxDriver()).withDefaultUrl("http://localhost:8080");
-        this.initTest();
+//        this.initFluent(new FirefoxDriver()).withDefaultUrl("http://localhost:8080");
+//        this.initTest();
     }
 
 //    @When("^je suis sur la page result$")
