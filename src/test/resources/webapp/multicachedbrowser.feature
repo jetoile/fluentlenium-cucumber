@@ -30,6 +30,9 @@ Feature: cached_multibrowser
     | chrome    | webdriver.chrome.driver:/opt/chromedriver/chromedriver                | none |         |             |
 
 
+
+
+
   Scenario Outline: close
     Given I connect on url http://localhost:8080 with different cached browsers:
       | <browser> | <parameters> | <host> | <version> | <os.platform> |

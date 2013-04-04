@@ -66,6 +66,7 @@ public class FluentLeniumStepInitilizer extends FluentPageInjector {
                     }
                 case 1:
                     browser = Browser.getBrowser(browserLine.get(0));
+					capabilities.setBrowserName(browser.getName());
             }
         }
 
