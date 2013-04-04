@@ -1,6 +1,7 @@
 package step;
 
 import cucumber.api.DataTable;
+import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import mapper.Browser;
@@ -39,6 +40,11 @@ public class FluentLeniumStepInitilizer extends FluentPageInjector {
     public void close() {
         this.quit();
     }
+
+	@After
+	public void afterClose() {
+		this.quit();
+	}
 
     private void init(String host, List<String> browserLine, boolean cached) {
         String browserHost = "none";
