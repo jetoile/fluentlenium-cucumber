@@ -6,9 +6,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BrowserMapper {
 	private String name;
@@ -34,15 +35,11 @@ public class BrowserMapper {
 	public static WebDriver getDriver(Browser browser, Capabilities capabilities) {
 		WebDriverLazyLoader webDriverLazyLoader = browserMapper.get(browser);
 		if (webDriverLazyLoader != null) {
-            if (browser == Browser.PHANTOMJS) {
-                return webDriverLazyLoader.getWebDriverClass(capabilities);
-
-            } else if (browser == Browser.CHROME) {
+            if (browser == Browser.CHROME) {
                 System.setProperty("webdriver.chrome.driver", (String) capabilities.getCapability("webdriver.chrome.driver"));
                 return webDriverLazyLoader.getWebDriverClass(capabilities);
-
             } else {
-                return webDriverLazyLoader.getWebDriverClass();
+                return webDriverLazyLoader.getWebDriverClass(capabilities);
             }
 		}
 		return browserMapper.get(Browser.HTMLUNIT).getWebDriverClass();

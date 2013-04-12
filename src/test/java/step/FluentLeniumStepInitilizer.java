@@ -4,27 +4,54 @@ import cucumber.api.DataTable;
 import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import harstorage.HarStorage;
 import mapper.Browser;
 import mapper.BrowserMapper;
+import org.browsermob.core.har.Har;
+import org.browsermob.proxy.ProxyServer;
 import org.fluentlenium.core.Fluent;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 public class FluentLeniumStepInitilizer extends FluentPageInjector {
 
+	// BrowserMob Proxy API
+	private static final String PROXY_API_HOST = "localhost";
+	private static final String PROXY_API_PORT = "9090";
+
+	// Temporary proxy for browser you create via BrowserMob Proxy.
+	// PROXY_HOST must be equal to PROXY_API_HOST
+	private static final String PROXY_HOST = PROXY_API_HOST;
+	private static final String PROXY_PORT = "9091";
+
+	private static boolean isCached = false;
+
+	// HAR Storage
+	private static String HARSTORAGE_HOST = "localhost";
+	private static int HARSTORAGE_PORT = 5000;
+
+	private static ProxyServer server;
+
     @Given("^I connect on url ([^ ]*) with different cached browsers:$")
     public void browser_connect_with_cached_webDriver(String host, DataTable dataTable) {
+
+		isCached = true;
 
         List<List<String>> raw = dataTable.raw();
         List<String> browserLine = raw.get(0);
 
-        init(host, browserLine, true);
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+
+		init(host, browserLine, capabilities, true);
     }
 
     @Given("^I connect on url ([^ ]*) with different browsers:$")
@@ -33,26 +60,88 @@ public class FluentLeniumStepInitilizer extends FluentPageInjector {
         List<List<String>> raw = dataTable.raw();
         List<String> browserLine = raw.get(0);
 
-        init(host, browserLine, false);
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+
+		init(host, browserLine, capabilities, false);
     }
 
+	@Given("^I connect on url ([^ ]*) with different browsers and I register the HarStorage Server on ([^ ]*):(\\d+) with name ([^ ]*):$")
+	public void registerHarStorageServer(String host, String hostHarStorage, int portHarStorage, String name, DataTable dataTable) throws Exception {
+
+		HARSTORAGE_HOST = hostHarStorage;
+		HARSTORAGE_PORT = portHarStorage;
+
+		server = new ProxyServer(Integer.valueOf(PROXY_API_PORT));
+		server.start();
+
+
+		// Change browser settings
+		Proxy proxy = server.seleniumProxy();
+
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setCapability(CapabilityType.PROXY, proxy);
+
+		List<List<String>> raw = dataTable.raw();
+		List<String> browserLine = raw.get(0);
+
+		init(host, browserLine, capabilities, false);
+
+		server.newHar(name);
+	}
+
+	@Given("^I send har files to the HarStorage Server")
+	public void sendHarFileAndCloseHarProxy() throws Exception {
+		// Read data from container
+		Har har = server.getHar();
+		String strFilePath = "target/selenium_report.har";
+		File file = new File(strFilePath);
+		if (file.exists()) {
+			file.delete();
+		}
+		FileOutputStream fos = new FileOutputStream(file);
+		har.writeTo(fos);
+		server.stop();
+
+		InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file) );
+		LineNumberReader lineNumberReader = new LineNumberReader(inputStreamReader);
+		String ligne;
+		String res = "";
+		while ((ligne = lineNumberReader.readLine()) != null)
+		{
+			res += ligne;
+		}
+
+		// Send results to HAR Storage
+		try {
+			HarStorage hs = new HarStorage(HARSTORAGE_HOST, Integer.toString(HARSTORAGE_PORT));
+
+			String response = hs.save(res);
+			System.out.println(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
     @Then("^drivers are closed")
-    public void close() {
-        this.quit();
+    public void close() throws Exception {
+		isCached = false;
+        afterClose();
     }
 
 	@After
-	public void afterClose() {
-		this.quit();
+	public void afterClose() throws Exception {
+		if (!isCached) {
+			this.quit();
+		}
+		if (server != null) {
+			server.stop();
+		}
 	}
 
-    private void init(String host, List<String> browserLine, boolean cached) {
+    private void init(String host, List<String> browserLine, DesiredCapabilities capabilities, boolean cached) {
         String browserHost = "none";
 
         Browser browser = null;
-
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-
 
         if (browserLine != null && !browserLine.isEmpty()) {
             switch (browserLine.size()) {
