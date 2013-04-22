@@ -18,8 +18,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.List;
 
 public class FluentLeniumStepInitilizer extends FluentPageInjector {
@@ -77,6 +77,9 @@ public class FluentLeniumStepInitilizer extends FluentPageInjector {
 
 		// Change browser settings
 		Proxy proxy = server.seleniumProxy();
+		String ip = getIp();
+		proxy.setHttpProxy(ip + ":" + PROXY_API_PORT);
+		proxy.setHttpProxy(ip + ":" + PROXY_API_PORT);
 
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setCapability(CapabilityType.PROXY, proxy);
@@ -137,6 +140,26 @@ public class FluentLeniumStepInitilizer extends FluentPageInjector {
 			server.stop();
 		}
 	}
+
+	private String getIp() throws SocketException {
+		String ip = "";
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		while (interfaces.hasMoreElements()) {
+			NetworkInterface iface = interfaces.nextElement();
+			// filters out 127.0.0.1 and inactive interfaces
+			if (iface.isLoopback() || !iface.isUp())
+				continue;
+
+			Enumeration<InetAddress> addresses = iface.getInetAddresses();
+			while(addresses.hasMoreElements()) {
+				InetAddress addr = addresses.nextElement();
+				ip = addr.getHostAddress();
+//				System.out.println(iface.getDisplayName() + " " + ip);
+			}
+		}
+		return ip;
+	}
+
 
     private void init(String host, List<String> browserLine, DesiredCapabilities capabilities, boolean cached) {
         String browserHost = "none";
